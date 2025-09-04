@@ -53,6 +53,7 @@ you can use to alter behaviour
 * -address  : sets the IP address to bind the server to (default 0.0.0.0)
 * -port  : sets the port number (default 8080)
 * -logtype : format for logs, either console (default) or json
+* -loglevel : sets log level: debug, info (default), warn, error
 * -color : enable colored output for console logs
 * -osname : Connection OS Name in Whatsapp
 * -skipmedia : Skip downloading media from messages
@@ -62,21 +63,21 @@ you can use to alter behaviour
 
 Example:
 
-To have colored logs:
+To have colored logs with debug level:
 
 ```
-./wuzapi -logtype=console -color=true
+./wuzapi -logtype=console -color=true -loglevel=debug
 ```
 
 For JSON logs:
 
 ```
-./wuzapi -logtype json 
+./wuzapi -logtype json
 ```
 
-With time zone: 
+With time zone:
 
-Set `TZ=America/New_York ./wuzapi ...` in your shell or in your .env file or Docker Compose environment: `TZ=America/New_York`.  
+Set `TZ=America/New_York ./wuzapi ...` in your shell or in your .env file or Docker Compose environment: `TZ=America/New_York`.
 
 ## Configuration
 
@@ -94,12 +95,14 @@ DB_SSLMODE=false
 TZ=America/New_York
 WEBHOOK_FORMAT=json # or "form" for the default
 SESSION_DEVICE_NAME=WuzAPI
+LOG_LEVEL=info # debug, info, warn, error
 ```
 
 ### For SQLite
 ```
 WUZAPI_ADMIN_TOKEN=your_admin_token_here
 TZ=America/New_York
+LOG_LEVEL=info # debug, info, warn, error
 ```
 
 ### RabbitMQ Integration
@@ -123,6 +126,7 @@ When enabled:
 
 * WUZAPI_ADMIN_TOKEN: Required - Authentication token for admin endpoints
 * TZ: Optional - Timezone for server operations (default: UTC)
+* LOG_LEVEL: Optional - Log verbosity level (default: info)
 * PostgreSQL-specific options: Only required when using PostgreSQL backend
 * RabbitMQ options: Optional, only required if you want to publish events to RabbitMQ
 
@@ -146,7 +150,7 @@ Then you can use the /admin/users endpoint with the Authorization header contain
 
 The JSON body for creating a new user must contain:
 
-- `name` [string] : User's name 
+- `name` [string] : User's name
 - `token` [string] : Security token to authorize/authenticate this user
 - `webhook` [string] : URL to send events via POST (optional)
 - `events` [string] : Comma-separated list of events to receive (required) - Valid events are: "Message", "ReadReceipt", "Presence", "HistorySync", "ChatPresence", "All"
@@ -198,7 +202,7 @@ You can create a user with optional proxy and S3 storage configuration. All fiel
 
 If you omit `proxyConfig` or `s3Config`, the user will be created without proxy or S3 integration, maintaining full backward compatibility.
 
-## API reference 
+## API reference
 
 API calls should be made with content type json, and parameters sent into the
 request body, always passing the Token header for authenticating the request.

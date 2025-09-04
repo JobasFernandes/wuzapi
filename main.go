@@ -38,6 +38,7 @@ var (
 	port          = flag.String("port", "8080", "Listen Port")
 	waDebug       = flag.String("wadebug", "", "Enable whatsmeow debug (INFO or DEBUG)")
 	logType       = flag.String("logtype", "console", "Type of log output (console or json)")
+	logLevel      = flag.String("loglevel", "info", "Log level (debug, info, warn, error)")
 	skipMedia     = flag.Bool("skipmedia", false, "Do not attempt to download media in messages")
 	osName        = flag.String("osname", "Mac OS 10", "Connection OSName in Whatsapp")
 	colorOutput   = flag.Bool("color", false, "Enable colored output for console logs")
@@ -63,6 +64,28 @@ func init() {
 	}
 
 	flag.Parse()
+
+	// Configure log level from environment variable if set
+	if v := os.Getenv("LOG_LEVEL"); v != "" {
+		*logLevel = v
+	}
+
+	// Set global log level
+	switch strings.ToLower(*logLevel) {
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Debug().Msg("Log level set to DEBUG")
+	case "info":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "warn", "warning":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "error":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		log.Warn().Str("invalid_level", *logLevel).Msg("Invalid log level, defaulting to INFO")
+		*logLevel = "info"
+	}
 
 	// Novo bloco para sobrescrever o osName pelo ENV, se existir
 	if v := os.Getenv("SESSION_DEVICE_NAME"); v != "" {
